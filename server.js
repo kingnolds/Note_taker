@@ -12,10 +12,10 @@ app.use(express.json());
 // Sets up the Express app to serve static files
 app.use(express.static('public'))
 
+// get routes for notes
 app.get('/api/notes', (req, res) => {
     readFromFile('./db/db.json').then(function(data) {
         var notes = JSON.parse(data)
-        console.log(notes)
         res.json(notes)
     }).catch(function(err) {
         console.log(err)
@@ -23,18 +23,19 @@ app.get('/api/notes', (req, res) => {
     })
 })
 
+// post route for adding notes
 app.post('/api/notes', (req, res) => {
     req.body["id"]= uuidv4()
     readAndAppend(req.body, './db/db.json')
     res.json({ok:true})
 })
 
+// Delete route for removing notes
 app.delete('/api/notes/:id', (req, res) => {
     readFromFile('./db/db.json').then((data) => {
         const notes = JSON.parse(data)
         const id = req.params.id
         const newData = notes.filter(note => note.id !== id)
-        console.log(newData)
         writeToFile('./db/db.json', newData)
         res.json(newData)
     }).catch(function(err) {
@@ -53,11 +54,6 @@ app.get('/notes', (req, res) =>
   res.sendFile(path.join(__dirname, '/public/notes.html'))
 );
 
-
-
-// app.get('*', (req, res) =>
-//   res.sendFile(path.join(__dirname, '/public/pages/404.html'))
-// )
 
 app.listen(PORT, () =>
   console.log(`App listening at http://localhost:${PORT} 🚀`)
